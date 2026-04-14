@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+  GREETING: Hello, world!
+  APPLICATION_NAME: pivot
+  BUILD_ENV: CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64
+  BUILD_FLAGS: -o
+  BINARY_LOC: bin
+  GOBUILD: go build
+  GOTEST: go test
+  VERSION: 0.0.1
+
+tasks:
+  default:
+    desc: Print a greeting message
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  clean:
+    cmds:
+      - rm -rf {{.BINARY_LOC}}
+  test:
+    cmds:
+      - "{{.GOTEST}} -v ./..."
+  build:
+    cmds:
+      - "{{.BUILD_ENVS}} {{.GOBUILD}} {{.BUILD_FLAGS}} ./{{.BINARY_LOC}}/ -v ."
+    sources:
+      - "**/*.go"
+    generates:
+      - "{{.BINARY_LOC}}/{{.APPLICATION_NAME}}"
+    # watch: true
+  run:
+    cmds:
+      - task: build
+      - ./{{.BINARY_LOC}}/{{.APPLICATION_NAME}}
